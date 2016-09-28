@@ -309,9 +309,13 @@ namespace Nant.Contrib.Tasks.Delphi
             }
         }
 
+
+        delegate void writePaths();
+
         private StringCollection BuildParameters()
         {
             StringCollection parameters = new StringCollection();
+            StringBuilder searchPath = new StringBuilder();
 
             foreach (CompilerOption option in this._compileroptions)
             {
@@ -336,6 +340,7 @@ namespace Nant.Contrib.Tasks.Delphi
                 {
                     paramFormat = "-N{0}";
                 }
+                searchPath.AppendFormat("{0};", _dcuOutput.ToString());
 
                 parameters.Add(String.Format(paramFormat, GetFilename(this._dcuOutput.ToString())));
             }
@@ -430,8 +435,8 @@ namespace Nant.Contrib.Tasks.Delphi
                 parameters.Add(String.Format("-NS{0}", nameSpacePath.ToString()));
             }
 
-            StringBuilder searchPath = new StringBuilder();
-            this.Log(Level.Debug, string.Format("There are {0} lib paths", this._unitpath.DirectoryNames.Count));
+            StringCollection paths = _unitpath.GetElements();
+            this.Log(Level.Debug, string.Format("There are {0} lib paths", paths.Count));
 
             if (_unitpath.IncludeDelphiLib) 
             {
@@ -449,23 +454,37 @@ namespace Nant.Contrib.Tasks.Delphi
                 searchPath.AppendFormat("{0};", libPath);
             }
 
-            foreach (string file in this._unitpath.DirectoryNames)
-            {
-                this.Log(Level.Debug, "Adding lib path: " + file);
-                searchPath.AppendFormat("{0};", file);
-            }
+            int totalLength = 0;
 
-            if (searchPath.Length > 0)
+            writePaths writePaths = delegate ()
             {
-                parameters.Add(String.Format("-U\"{0}\"", searchPath.ToString()));
-                parameters.Add(String.Format("-I\"{0}\"", searchPath.ToString()));
-                if (Version != "1")
+                if (searchPath.Length > 0)
                 {
-                    parameters.Add(String.Format("-O\"{0}\"", searchPath.ToString()));
-                    parameters.Add(String.Format("-R\"{0}\"", searchPath.ToString()));
+                    parameters.Add(String.Format("-U\"{0}\"", searchPath.ToString()));
+                    parameters.Add(String.Format("-I\"{0}\"", searchPath.ToString()));
+                    if (Version != "1")
+                    {
+                        parameters.Add(String.Format("-O\"{0}\"", searchPath.ToString()));
+                        parameters.Add(String.Format("-R\"{0}\"", searchPath.ToString()));
+                    }
                 }
+            };
 
+            foreach (string dir in paths)
+            {
+                this.Log(Level.Debug, "Adding lib path: " + dir);
+                totalLength += dir.Length + 1;
+                searchPath.AppendFormat("{0};", dir);
+                if (_writeCfg && totalLength > 1024)
+                {
+                    writePaths();
+                    searchPath.Clear();
+                    totalLength = 0;
+                }
             }
+
+
+            writePaths();
 
             return parameters;
         }
@@ -475,10 +494,6 @@ namespace Nant.Contrib.Tasks.Delphi
             get
             {
                 this.Log(Level.Info, "Building project '{0}'.", new object[] { this.Source.FullName });
-                if (this._unitpath.BaseDirectory == null)
-                {
-                    this._unitpath.BaseDirectory = new DirectoryInfo(this.Project.BaseDirectory);
-                }
 
                 StringBuilder commandLine = new StringBuilder();
 

@@ -9,9 +9,73 @@ using NAnt.Core;
 
 namespace Delphi.Nant.Contrib.Tasks.Delphi
 {
+    public class VersionProperty : Element
+    {
+        private string _name = "";
+        private string _value = "";
+        private bool _ifDefined = true;
+        private bool _unlessDefined;
+
+        public VersionProperty()
+        {
+
+        }
+
+        public VersionProperty(string name)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException("name");
+            }
+            this._name = name;
+        }
+
+        [TaskAttribute("name", Required = true), StringValidator(AllowEmpty = false)]
+        public string PropertyName
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        [TaskAttribute("value", Required = true)]
+        public string Value
+        {
+            get { return _value; }
+            set { this._value = value; }
+        }
+
+        [TaskAttribute("if")]
+        public bool IfDefined
+        {
+            get { return _ifDefined; }
+            set { _ifDefined = value; }
+        }
+
+        [TaskAttribute("unless")]
+        public bool UnlessDefined
+        {
+            get { return _unlessDefined; }
+            set { _unlessDefined = value; }
+        }
+
+        public virtual object Clone()
+        {
+            VersionProperty clone = new VersionProperty();
+            CopyTo(clone);
+            return clone;
+        }
+    }
+
+    [Serializable]
+    public class VersionPropertyCollection : List<VersionProperty>
+    {
+
+    }
+
     [TaskName("versioninfo")]
     public class VersionInfoTask : Task
     {
+
         private Version _productVersion;
         private Version _fileVersion;
         private string _fileDescription;
@@ -30,9 +94,10 @@ namespace Delphi.Nant.Contrib.Tasks.Delphi
         private bool _patchBuild;
         private bool _debugBuild;
         private bool _prereleaseBuild;
+        private VersionPropertyCollection _properties = new VersionPropertyCollection();
 
         [TaskAttribute("productname", Required = false)]
-        public string ProdcutName
+        public string ProductName
         {
             get { return _productName; }
             set { _productName = value; }
@@ -150,6 +215,12 @@ namespace Delphi.Nant.Contrib.Tasks.Delphi
             get {return _prereleaseBuild; }
             set {_prereleaseBuild = value; }
         }
+
+        [BuildElementCollection("versionproperties", "versionproperty")]
+        public VersionPropertyCollection properties
+        {
+            get { return _properties; }
+        }
         /*[TaskAttribute("fileflags")]
         public string FileFlags
         {
@@ -197,7 +268,8 @@ namespace Delphi.Nant.Contrib.Tasks.Delphi
                     buildFlags = buildFlags | 0x00000020;
                 }
 
-                writer.WriteLine(String.Format("{0, -20} {1}", "VS_VERSION_INFO", "VERSIONINFO"));
+                writer.WriteLine(String.Format("{0, -20} {1}", "LANGUAGE", "0, SUBLANG_NEUTRAL"));
+                writer.WriteLine(String.Format("{0, -20} {1}", "1", "VERSIONINFO"));
                 writer.WriteLine(String.Format("{0, -20} {1}", "FILEVERSION", _fileVersion.GetString(',')));
                 writer.WriteLine(String.Format("{0, -20} {1}", "PRODUCTVERSION", _productVersion.GetString(',')));
                 writer.WriteLine(String.Format("{0, -20} 0x{1:X2}L", "FILEFLAGSMASK", buildFlags));
@@ -205,28 +277,37 @@ namespace Delphi.Nant.Contrib.Tasks.Delphi
                 writer.WriteLine("BEGIN");
                 writer.WriteLine("    BLOCK \"StringFileInfo\"");
                 writer.WriteLine("    BEGIN");
-                writer.WriteLine("        BLOCK \"040904b0\"");
+                writer.WriteLine("        BLOCK \"040904e4\"");
                 writer.WriteLine("        BEGIN");
                 WriteProperty(writer, "CompanyName", _companyName);
                 WriteProperty(writer, "FileDescription", _fileDescription);
-                WriteProperty(writer, "FileVersion", _fileVersion.GetString('.'));
+                WriteProperty(writer, "FileVersion", _fileVersion.GetStringOrText());
                 WriteProperty(writer, "InternalName", _internalName);
                 WriteProperty(writer, "LegalCopyright", _copyright);
                 WriteProperty(writer, "LegalTrademarks", _trademarks);
                 WriteProperty(writer, "OriginalFilename", _originalFilename);
                 WriteProperty(writer, "ProductName", _productName);
-                WriteProperty(writer, "ProductVersion", _productVersion.GetString('.'));
+                WriteProperty(writer, "ProductVersion", _productVersion.GetStringOrText());
                 if (_specialBuild != string.Empty) {
                     WriteProperty(writer, "SpecialBuild", _specialBuild);
                 }
                 if (_privateBuild != string.Empty) {
                     WriteProperty(writer, "PrivateBuild", _privateBuild);
                 }
+
+                foreach (var prop in _properties)
+                {
+                    if (prop.IfDefined && !prop.UnlessDefined)
+                    {
+                        WriteProperty(writer, prop.PropertyName, prop.Value);
+                    }
+                }
+
                 writer.WriteLine("        END");
                 writer.WriteLine("    END");
                 writer.WriteLine("    BLOCK \"VarFileInfo\"");
                 writer.WriteLine("    BEGIN");
-                writer.WriteLine("        VALUE \"Translation\", 0x409, 1200");
+                writer.WriteLine("        VALUE \"Translation\", 0x409 0x04E4");
                 writer.WriteLine("    END");
                 writer.WriteLine("END");
 

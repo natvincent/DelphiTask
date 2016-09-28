@@ -10,4 +10,9 @@
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files\Build Tools\nant\bin\NAnt.exe</StartProgram>
+    <StartWorkingDirectory>C:\Projects\HMS\HMS</StartWorkingDirectory>
+  </PropertyGroup>
 </Project>

@@ -13,6 +13,7 @@ namespace Delphi.Nant.Contrib.Tasks.Delphi
         private int _minorVersion;
         private int _release;
         private int _build;
+        private string _text;
 
         [TaskAttribute("major")]
         public int Major
@@ -39,10 +40,28 @@ namespace Delphi.Nant.Contrib.Tasks.Delphi
             set { _build = value; }
         }
 
+        [TaskAttribute("text")]
+        public string Text
+        {
+            get { return _text; }
+            set { _text = value; }
+        }
+
         public string GetString(char Seperator)
         {
             return String.Format("{1:D}{0}{2:D}{0}{3:D}{0}{4:D}", Seperator, _majorVersion, _minorVersion, _release, _build);
         }
 
+        public string GetStringOrText()
+        {
+            if (string.IsNullOrEmpty(_text))
+            {
+                return GetString('.');
+            }
+            else
+            {
+                return _text;
+            }
+        }
     }
 }

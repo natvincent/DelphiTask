@@ -46,7 +46,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\Program Files\Build\Nant\bin\</OutputPath>
+    <OutputPath>..\..\Program Files\Build Tools\nant\bin\extensions\common\neutral\</OutputPath>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
@@ -69,7 +69,7 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\..\Program Files\Build\Nant\bin\</OutputPath>
+    <OutputPath>bin\Release</OutputPath>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
@@ -96,8 +96,9 @@
       <Name>mscorlib</Name>
       <HintPath>mscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="NAnt.Core">
-      <HintPath>..\..\..\..\Program Files (x86)\Build Tools\nant\NAnt.Core.dll</HintPath>
+    <Reference Include="NAnt.Core, Version=0.92.4543.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\NAnt.Core.0.92\lib\net40\NAnt.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -110,6 +111,7 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Nant.Contrib.Functions.Delphi\DelphiFunctions.cs" />
     <Compile Include="Nant.Contrib.Tasks.Delphi\BrccTask.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -134,6 +136,7 @@
     <Compile Include="Nant.Contrib.Tasks.Delphi\DefineEnumerator.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Nant.Contrib.Tasks.Delphi\DelphiFinder.cs" />
     <Compile Include="Nant.Contrib.Tasks.Delphi\DelphiTool.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -185,6 +188,11 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
