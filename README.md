@@ -25,6 +25,7 @@ Contains tasks to do the following:
 	</target>
 
 	<target name="compile" depends="clean">
+	
 		<versioninfo productname="My Project"
 	                 companyname="A Company"
 	                 copyright="Copyright (c) A Company 2017"
@@ -33,7 +34,9 @@ Contains tasks to do the following:
 	      		<productversion major="1" minor="0" release="0" build="34"/>
 	      		<fileversion major="1" minor="0" release="0" build="34"/>
 	    	</versioninfo>
+	
 		<brcc file="versioninfo.rc" version="7"/>
+		
 		<dcc source="Project1.dpr" 
 				version="7" 
 				writecfg="true" 
@@ -44,19 +47,19 @@ Contains tasks to do the following:
 				build="true" 
 				mapfile="detailed">
 			<compileroptions>
-			  <option name="L" value="False"/>
-			  <option name="D" value="False"/>
-			  <option name="Y" value="False"/>
-			  <option name="O" value="True"/>
-			  <option name="W" value="True"/>
-			  <option name="C" value="True"/>
+			  	<option name="L" value="False"/>
+			  	<option name="D" value="False"/>
+			  	<option name="Y" value="False"/>
+			  	<option name="O" value="True"/>
+			  	<option name="W" value="True"/>
+				<option name="C" value="True"/>
 			</compileroptions>
 			<unitpath includedelphilib="true">
 				<pathelement dir="source\" />
 				<path refid="lib" />
 			</unitpath>
 			<defines>
-			  <define name="ADEFINE" />
+				<define name="ADEFINE" />
 			</defines>
 		</dcc>
 	</target>
