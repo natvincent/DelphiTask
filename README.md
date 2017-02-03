@@ -33,8 +33,8 @@ Contains tasks to do the following:
 	      		<productversion major="1" minor="0" release="0" build="34"/>
 	      		<fileversion major="1" minor="0" release="0" build="34"/>
 	    	</versioninfo>
-	    	<brcc file="versioninfo.rc" version="7"/>
-            	<dcc source="Project1.dpr" 
+		<brcc file="versioninfo.rc" version="7"/>
+		<dcc source="Project1.dpr" 
 				version="7" 
 				writecfg="true" 
 				console="false" 
