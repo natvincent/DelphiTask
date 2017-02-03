@@ -46,7 +46,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\Program Files\Build Tools\nant\bin\extensions\common\neutral\</OutputPath>
+    <OutputPath>..\3rdParty\nant\build\Debug\</OutputPath>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
@@ -96,9 +96,8 @@
       <Name>mscorlib</Name>
       <HintPath>mscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="NAnt.Core, Version=0.92.4543.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\NAnt.Core.0.92\lib\net40\NAnt.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NAnt.Core">
+      <HintPath>..\..\Program Files\Build Tools\nant\bin\NAnt.Core.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
