@@ -31,9 +31,9 @@ Contains tasks to do the following:
 	                 copyright="Copyright (c) A Company 2017"
 	                 description="An example project"
 	                 target="versioninfo.rc">
-	      		<productversion major="1" minor="0" release="0" build="34"/>
-	      		<fileversion major="1" minor="0" release="0" build="34"/>
-	    	</versioninfo>
+			<productversion major="1" minor="0" release="0" build="34"/>
+			<fileversion major="1" minor="0" release="0" build="34"/>
+		</versioninfo>
 	
 		<brcc file="versioninfo.rc" version="7"/>
 		
