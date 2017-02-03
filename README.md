@@ -2,9 +2,9 @@
 Task for Delphi  &amp; Related tools for Nant
 
 Contains tasks to do the following:
-* <brcc> Task to compile resource file (calls brcc32.exe).
-* <versioninfo> Task to generate version information that can be compiled with <brcc>.
-* <dcc> Task to compile a Delphi project. Currently supports Delphi 2 - XE7.
+* `<brcc>` Task to compile resource file (calls brcc32.exe).
+* `<versioninfo>` Task to generate version information that can be compiled with `<brcc>`.
+* `<dcc>` Task to compile a Delphi project. Currently supports Delphi 2 - XE7.
 
 ```xml
 <project name="Project1" default="build">
