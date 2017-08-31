@@ -33,6 +33,11 @@ namespace Nant.Contrib.Tasks.Delphi
                 this._define = value;
             }
         }
+
+        override public string ToString()
+        {
+            return _define;
+        }
     }
 }
 

@@ -142,6 +142,7 @@
     <Compile Include="Nant.Contrib.Tasks.Delphi\Namespace.cs" />
     <Compile Include="Nant.Contrib.Tasks.Delphi\NamespaceCollection.cs" />
     <Compile Include="Nant.Contrib.Tasks.Delphi\Package.cs" />
+    <Compile Include="Nant.Contrib.Tasks.Delphi\BuildResource.cs" />
     <Compile Include="Nant.Contrib.Tasks.Delphi\UnitPath.cs" />
     <Compile Include="Nant.Contrib.Tasks.Delphi\Warning.cs" />
     <Compile Include="NAnt.Contrib.Types.Delphi\Version.cs" />

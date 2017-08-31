@@ -95,6 +95,13 @@ namespace Delphi.Nant.Contrib.Tasks.Delphi
         private bool _debugBuild;
         private bool _prereleaseBuild;
         private VersionPropertyCollection _properties = new VersionPropertyCollection();
+        private bool _append = false;
+
+        public bool Append
+        {
+            get { return _append; }
+            set { _append = value; }
+        }
 
         [TaskAttribute("productname", Required = false)]
         public string ProductName
@@ -164,7 +171,7 @@ namespace Delphi.Nant.Contrib.Tasks.Delphi
             set { _internalName = value; }
         }
 
-        [TaskAttribute("target", Required = true)]
+        [TaskAttribute("target", Required = false)]
         [StringValidator(AllowEmpty = false)]
         public FileInfo Target
         {
@@ -238,13 +245,18 @@ namespace Delphi.Nant.Contrib.Tasks.Delphi
 
         protected override void ExecuteTask()
         {
+            if (String.IsNullOrEmpty(Target.FullName))
+            {
+                throw new ValidationException("Target filename is required for version information.");
+            }
+
             if (!Target.Directory.Exists)
             {
                 Target.Directory.Create();
                 Target.Directory.Refresh();
             }
 
-            using (StreamWriter writer = new StreamWriter(Target.FullName, false, Encoding.Default))
+            using (StreamWriter writer = new StreamWriter(Target.FullName, _append, Encoding.Default))
             {
                 int buildFlags = 0;
                 

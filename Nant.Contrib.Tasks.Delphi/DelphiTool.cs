@@ -21,6 +21,7 @@ namespace Nant.Contrib.Tasks.Delphi
 
         private string _versionString = String.Empty;
         private string _toolPath = String.Empty;
+        private string _toolExe = String.Empty;
 
         public override string ProgramArguments
         {
@@ -85,13 +86,26 @@ namespace Nant.Contrib.Tasks.Delphi
             }
         }
 
+        [TaskAttribute("toolexe", Required = false)]
+        public string ToolExe
+        {
+            get { return _toolExe; }
+            set { _toolExe = value; }
+        }
+
         private string findExecutable()
         {
             DelphiFinder finder = new DelphiFinder(_versionString, _toolPath, BaseDirectory);
 
             string toolPath;
 
-            if (!finder.findExecutable(this.ToolName, out toolPath))
+            string toolExe = ToolName;
+            if (!String.IsNullOrEmpty(_toolExe))
+            {
+                toolExe = _toolExe;
+            }
+
+            if (!finder.findExecutable(toolExe, out toolPath))
             {
                 throw new BuildException(string.Format("Unable to locate Delphi tool \"{0}\" (looking in {1})", ToolName, toolPath));
             }

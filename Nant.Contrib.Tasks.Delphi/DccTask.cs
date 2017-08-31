@@ -8,6 +8,7 @@ namespace Nant.Contrib.Tasks.Delphi
     using System.Text;
     using System.Collections.Specialized;
     using System.Text.RegularExpressions;
+    using System.Runtime.InteropServices;
 
     [TaskName("dcc")]
     public class DccTask : DelphiTool
@@ -309,6 +310,33 @@ namespace Nant.Contrib.Tasks.Delphi
             }
         }
 
+        [DllImport("shlwapi.dll", CharSet = CharSet.Auto)]
+        static extern bool PathRelativePathTo(
+             [Out] StringBuilder pszPath,
+             [In] string pszFrom,
+             [In] FileAttributes dwAttrFrom,
+             [In] string pszTo,
+             [In] FileAttributes dwAttrTo
+        );
+
+        private string GetToRelativePath(string from, string to)
+        {
+            const Int32 MAX_PATH = 260;
+            StringBuilder builder = new StringBuilder(MAX_PATH);
+            if (Path.GetPathRoot(from) == Path.GetPathRoot(to))
+            {
+                Boolean bRet = PathRelativePathTo(
+                     builder,
+                     from, FileAttributes.Directory,
+                     to, FileAttributes.Normal
+                     );
+                return builder.ToString();
+            }
+            else
+            {
+                return to;
+            }
+        }
 
         delegate void writePaths();
 
@@ -420,9 +448,10 @@ namespace Nant.Contrib.Tasks.Delphi
                 parameters.Add(String.Format("-W{0}{1}", warning.State, warning.WarningName));
             }
 
-            foreach (Define define in this._defines)
+            string defines = string.Join<Define>(";", _defines);
+            if (!string.IsNullOrEmpty(defines))
             {
-                parameters.Add(String.Format("-D{0}", define.DefineName));
+                parameters.Add(String.Format("-D{0}", defines));
             }
 
             if (_nameSpaces.Count > 0)
@@ -472,9 +501,10 @@ namespace Nant.Contrib.Tasks.Delphi
 
             foreach (string dir in paths)
             {
-                this.Log(Level.Debug, "Adding lib path: " + dir);
-                totalLength += dir.Length + 1;
-                searchPath.AppendFormat("{0};", dir);
+                string relativeDir = GetToRelativePath(Project.BaseDirectory.ToString(), dir);
+                this.Log(Level.Debug, "Adding lib path: " + relativeDir);
+                totalLength += relativeDir.Length + 1;
+                searchPath.AppendFormat("{0};", relativeDir);
                 if (_writeCfg && totalLength > 1024)
                 {
                     writePaths();

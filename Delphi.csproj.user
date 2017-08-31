@@ -13,7 +13,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
     <StartProgram>C:\Projects\3rdParty\nant\build\Debug\NAnt.exe</StartProgram>
-    <StartWorkingDirectory>C:\Projects\trunk\Clinical\</StartWorkingDirectory>
+    <StartWorkingDirectory>d:\trunk\office</StartWorkingDirectory>
+    <StartArguments>-debug+</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <ReferencePath>C:\Projects\3rdParty\nant\src\NAnt.Core\Functions\;C:\Projects\3rdParty\nant\src\NAnt.Core\Attributes\;C:\Projects\3rdParty\nant\src\NAnt.Core\Types\;C:\Projects\3rdParty\nant\src\NAnt.Core\Tasks\;C:\Projects\3rdParty\nant\build\Debug\</ReferencePath>

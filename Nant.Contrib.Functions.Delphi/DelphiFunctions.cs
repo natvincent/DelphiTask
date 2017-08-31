@@ -13,9 +13,9 @@ namespace Nant.Contrib.Tasks.Delphi
         public DelphiFunctions(Project project, PropertyDictionary properties) : base(project, properties) { }
 
         [Function("path")]    
-        public static string DelphiPath(string version = "")
+        public string DelphiPath(string version = "")
         {
-            DelphiFinder finder = new DelphiFinder(version);
+            DelphiFinder finder = new DelphiFinder(version, Project);
             return finder.DelphToolDir;
         }    
     }

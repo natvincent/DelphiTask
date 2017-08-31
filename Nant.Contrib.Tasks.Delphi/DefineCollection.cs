@@ -2,10 +2,12 @@ namespace Nant.Contrib.Tasks.Delphi
 {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Reflection;
 
     [Serializable]
-    public class DefineCollection : CollectionBase
+    public class DefineCollection : List<Define> { }
+    /*public class DefineCollection : CollectionBase
     {
         public int Add(Define item)
         {
@@ -64,6 +66,6 @@ namespace Nant.Contrib.Tasks.Delphi
                 base.List[index] = value;
             }
         }
-    }
+    }*/
 }
 

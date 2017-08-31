@@ -16,24 +16,28 @@ namespace Nant.Contrib.Tasks.Delphi
 {
     public class DelphiFinder 
     {
-        private const string BORLAND_BDS_REG_PATH = @"SOFTWARE\Borland\BDS\";
-        private const string CODEGEAR_BDS_REG_PATH = @"SOFTWARE\CodeGear\BDS\";
-        private const string BORLAND_DELPHI_REG_PATH = @"SOFTWARE\Borland\Delphi\";
-        private const string EMBARCADERO_BDS_REG_PATH = @"SOFTWARE\Embarcadero\BDS\";
+        private const string SOFTWARE_ROOT_PATH = @"SOFTWARE\";
+        private const string SOFTWARE_32_BIT_ON_64_BIT_PATH = @"Wow6432Node\";
+        private const string BORLAND_BDS_REG_PATH = @"Borland\BDS\";
+        private const string CODEGEAR_BDS_REG_PATH = @"CodeGear\BDS\";
+        private const string BORLAND_DELPHI_REG_PATH = @"Borland\Delphi\";
+        private const string EMBARCADERO_BDS_REG_PATH = @"Embarcadero\BDS\";
 
         private string _versionString = String.Empty;
         private string _toolPath = String.Empty;
         private DirectoryInfo _basePath;
+        private Project _project = null;
 
         private Dictionary<string, string> _versionRegistryPaths = new Dictionary<string, string>();
 
-        public DelphiFinder(string versionString) : this(versionString, "", null) {}
+        public DelphiFinder(string versionString, Project project = null) : this(versionString, "", null, project) {}
 
-        public DelphiFinder(string versionString, string toolPath, DirectoryInfo basePath)
+        public DelphiFinder(string versionString, string toolPath, DirectoryInfo basePath, Project project = null)
         {
             _versionString = versionString;
             _toolPath = toolPath;
             _basePath = basePath;
+            _project = project;
 
             _versionRegistryPaths["2"] = BORLAND_DELPHI_REG_PATH + @"2.0\";
             _versionRegistryPaths["3"] = BORLAND_DELPHI_REG_PATH + @"3.0\";
@@ -57,6 +61,14 @@ namespace Nant.Contrib.Tasks.Delphi
             _versionRegistryPaths["XE8"] = EMBARCADERO_BDS_REG_PATH + "16.0\\";
             _versionRegistryPaths["Seattle"] = EMBARCADERO_BDS_REG_PATH + "17.0\\";
             _versionRegistryPaths["Berlin"] = EMBARCADERO_BDS_REG_PATH + "18.0\\";
+        }
+
+        public void Log(Level messageLevel, string format)
+        {
+            if (_project != null)
+            {
+                _project.Log(messageLevel, format);
+            }
         }
 
         private string AbsoluteToRelativePath(string mainDirPath, string absoluteFilePath)
@@ -196,6 +208,24 @@ namespace Nant.Contrib.Tasks.Delphi
                  [MarshalAs(UnmanagedType.LPTStr)]
                  string lpValue);
 
+        private bool PathFromRegistry(RegistryKey rootKey, string delphiKeyName, ref RegistryKey delphiKey)
+        {
+            string key = SOFTWARE_ROOT_PATH + delphiKeyName;
+            delphiKey = rootKey.OpenSubKey(key, false);
+            if (delphiKey == null)
+            {
+                Log(Level.Debug, string.Format(@"Delphi key not found at {0}\{1}, trying in 32bit key in 64 bit environment", rootKey, key));
+                key = SOFTWARE_ROOT_PATH + SOFTWARE_32_BIT_ON_64_BIT_PATH + delphiKeyName;
+                delphiKey = rootKey.OpenSubKey(key, false);
+                if (delphiKey == null)
+                {
+                    Log(Level.Debug, string.Format(@"Delphi key not found at {0}\{1}", rootKey, key));
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public string DelphToolDir
         {
             get
@@ -226,16 +256,16 @@ namespace Nant.Contrib.Tasks.Delphi
                     }
                     else
                     {
-                        string rootKey;
+                        string delphiKey;
 
-                        if (!_versionRegistryPaths.TryGetValue(_versionString, out rootKey))
+                        if (!_versionRegistryPaths.TryGetValue(_versionString, out delphiKey))
                         {
                             throw new BuildException(string.Format("Delphi version {0} not supported", this._versionString));
                         }
                         else
                         {
-                            RegistryKey key = Registry.CurrentUser.OpenSubKey(rootKey, false);
-                            if (key == null)
+                            RegistryKey key = null;
+                            if (!PathFromRegistry(Registry.CurrentUser, delphiKey, ref key) && !PathFromRegistry(Registry.LocalMachine, delphiKey, ref key))
                             {
                                 throw new BuildException(string.Format("Delphi version {0} not found in registry", this._versionString));
                             }
