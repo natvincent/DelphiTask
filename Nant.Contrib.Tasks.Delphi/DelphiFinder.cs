@@ -24,17 +24,19 @@ namespace Nant.Contrib.Tasks.Delphi
         private const string EMBARCADERO_BDS_REG_PATH = @"Embarcadero\BDS\";
 
         private string _versionString = String.Empty;
+        private int _bdsVersion = 0;
         private string _toolPath = String.Empty;
         private DirectoryInfo _basePath;
         private Project _project = null;
 
         private Dictionary<string, string> _versionRegistryPaths = new Dictionary<string, string>();
 
-        public DelphiFinder(string versionString, Project project = null) : this(versionString, "", null, project) {}
+        public DelphiFinder(string versionString, int bdsVersion, Project project = null) : this(versionString, bdsVersion, "", null, project) {}
 
-        public DelphiFinder(string versionString, string toolPath, DirectoryInfo basePath, Project project = null)
+        public DelphiFinder(string versionString, int bdsVersion, string toolPath, DirectoryInfo basePath, Project project = null)
         {
             _versionString = versionString;
+            _bdsVersion = bdsVersion;
             _toolPath = toolPath;
             _basePath = basePath;
             _project = project;
@@ -51,16 +53,17 @@ namespace Nant.Contrib.Tasks.Delphi
             _versionRegistryPaths["2007"] = BORLAND_BDS_REG_PATH + "5.0\\";
             _versionRegistryPaths["2009"] = CODEGEAR_BDS_REG_PATH + "6.0\\";
             _versionRegistryPaths["2010"] = CODEGEAR_BDS_REG_PATH + "7.0\\";
-            _versionRegistryPaths["XE"] = EMBARCADERO_BDS_REG_PATH + "8.0\\";
-            _versionRegistryPaths["XE2"] = EMBARCADERO_BDS_REG_PATH + "9.0\\";
-            _versionRegistryPaths["XE3"] = EMBARCADERO_BDS_REG_PATH + "10.0\\";
-            _versionRegistryPaths["XE4"] = EMBARCADERO_BDS_REG_PATH + "11.0\\";
-            _versionRegistryPaths["XE5"] = EMBARCADERO_BDS_REG_PATH + "12.0\\";
-            _versionRegistryPaths["XE6"] = EMBARCADERO_BDS_REG_PATH + "14.0\\";
-            _versionRegistryPaths["XE7"] = EMBARCADERO_BDS_REG_PATH + "15.0\\";
-            _versionRegistryPaths["XE8"] = EMBARCADERO_BDS_REG_PATH + "16.0\\";
-            _versionRegistryPaths["Seattle"] = EMBARCADERO_BDS_REG_PATH + "17.0\\";
-            _versionRegistryPaths["Berlin"] = EMBARCADERO_BDS_REG_PATH + "18.0\\";
+            _versionRegistryPaths["xe"] = EMBARCADERO_BDS_REG_PATH + "8.0\\";
+            _versionRegistryPaths["xe2"] = EMBARCADERO_BDS_REG_PATH + "9.0\\";
+            _versionRegistryPaths["xe3"] = EMBARCADERO_BDS_REG_PATH + "10.0\\";
+            _versionRegistryPaths["xe4"] = EMBARCADERO_BDS_REG_PATH + "11.0\\";
+            _versionRegistryPaths["xe5"] = EMBARCADERO_BDS_REG_PATH + "12.0\\";
+            _versionRegistryPaths["xe6"] = EMBARCADERO_BDS_REG_PATH + "14.0\\";
+            _versionRegistryPaths["xe7"] = EMBARCADERO_BDS_REG_PATH + "15.0\\";
+            _versionRegistryPaths["xe8"] = EMBARCADERO_BDS_REG_PATH + "16.0\\";
+            _versionRegistryPaths["seattle"] = EMBARCADERO_BDS_REG_PATH + "17.0\\";
+            _versionRegistryPaths["berlin"] = EMBARCADERO_BDS_REG_PATH + "18.0\\";
+            _versionRegistryPaths["tokyo"] = EMBARCADERO_BDS_REG_PATH + "19.0\\";
         }
 
         public void Log(Level messageLevel, string format)
@@ -254,11 +257,24 @@ namespace Nant.Contrib.Tasks.Delphi
                             }
                         }
                     }
+                    else if (_bdsVersion > 0)
+                    {
+                        RegistryKey key = null;
+
+                        string bdsKey = String.Format("{0}{1}\\", EMBARCADERO_BDS_REG_PATH, _bdsVersion);
+
+                        if (!PathFromRegistry(Registry.CurrentUser, bdsKey, ref key) && !PathFromRegistry(Registry.LocalMachine, bdsKey, ref key))
+                        {
+                            throw new BuildException(string.Format("BDS version {0} not supported", this._versionString));
+                        }
+
+                        directory = getDelphiRootPath(key);
+                    }
                     else
                     {
                         string delphiKey;
 
-                        if (!_versionRegistryPaths.TryGetValue(_versionString, out delphiKey))
+                        if (!_versionRegistryPaths.TryGetValue(_versionString.ToLower(), out delphiKey))
                         {
                             throw new BuildException(string.Format("Delphi version {0} not supported", this._versionString));
                         }

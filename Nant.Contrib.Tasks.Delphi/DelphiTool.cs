@@ -20,6 +20,7 @@ namespace Nant.Contrib.Tasks.Delphi
     {
 
         private string _versionString = String.Empty;
+        private int _bdsVersion = 0;
         private string _toolPath = String.Empty;
         private string _toolExe = String.Empty;
 
@@ -58,7 +59,7 @@ namespace Nant.Contrib.Tasks.Delphi
         [TaskAttribute("version")]
         [StringValidator(
             AllowEmpty = true,
-            Expression = "2|3|4|5|6|7|2005|2006|2007|2009|2010|XE|XE2|XE3|XE4|XE5|XE6|XE7|XE8|Seattle|Berlin",
+            Expression = "(?i:2|3|4|5|6|7|2005|2006|2007|2009|2010|xe|xe2|xe3|xe4|xe5|xe6|xe7|xe8|seattle|berlin|tokyo)",
             ExpressionErrorMessage = "Must be an empty string or one of 'detailed', 'public', 'segments' or 'off'")]
         public string Version
         {
@@ -70,6 +71,19 @@ namespace Nant.Contrib.Tasks.Delphi
             {
                 this._versionString = value;
 
+            }
+        }
+
+        [TaskAttribute("bdsversion")]
+        public int BDSVersion
+        {
+            get
+            {
+                return _bdsVersion;
+            }
+            set
+            {
+                _bdsVersion = value;
             }
         }
 
@@ -95,7 +109,7 @@ namespace Nant.Contrib.Tasks.Delphi
 
         private string findExecutable()
         {
-            DelphiFinder finder = new DelphiFinder(_versionString, _toolPath, BaseDirectory);
+            DelphiFinder finder = new DelphiFinder(_versionString, _bdsVersion, _toolPath, BaseDirectory);
 
             string toolPath;
 
@@ -132,7 +146,7 @@ namespace Nant.Contrib.Tasks.Delphi
                 }
                 else
                 {
-                    DelphiFinder finder = new DelphiFinder(_versionString, _toolPath, BaseDirectory);
+                    DelphiFinder finder = new DelphiFinder(_versionString, _bdsVersion, _toolPath, BaseDirectory);
 
                     return finder.DelphToolDir;
                 }
